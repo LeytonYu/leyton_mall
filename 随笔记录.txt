@@ -1,0 +1,9 @@
+
+fdfs启动：
+sudo service fdfs_trackerd start
+sudo service fdfs_storaged start
+
+nginx启动(关闭)：
+sudo /usr/loacl/nginx/sbin/nginx (-stop)
+
+Linux下： fdfs_upload_file /etc/fdfs/client.conf 图片路径
