@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}雷顿商城-登录{% endblock title %}
+{% block topfiles%}
+	<script type="text/javascript" src="{% static 'js/jquery-1.12.4.min.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/login.js' %}"></script>
+{% endblock topfiles %}
 {% block header_con %}{% endblock header_con %}
 {% block search_bar %}{% endblock search_bar %}
 
@@ -8,10 +12,10 @@
 
     <div class="login_form_bg">
         <div class="login_top clearfix">
-            <a href="{% url 'goods:index' %}" class="login_logo"><img src="{% static 'images/logo.png' %}"></a>
+            <a href="{% url 'goods:index' %}" class="login_logo"><img src="{% static 'images/logo.png' %}" alt="图片加载中"></a>
         </div>
         <div class="login_form_wrap clearfix">
-            <div class="login_banner fl"><img src="{% static 'images/login_banner.png' %}" ></div>
+            <div class="login_banner fl"><img src="{% static 'images/login_banner.png' %}" alt=""></div>
             <div class="slogan fl">闪电配送 · 品质保证</div>
             <div class="login_form fr">
                 <div class="login_title clearfix">
@@ -24,9 +28,13 @@
                         {% csrf_token %}
                         <input type="text" name="username" class="name_input" value="{{ username }}"
                                placeholder="请输入用户名">
-                        <div class="user_error">输入错误</div>
+                        <div id="name_err" class="user_error">
+                            <label  style="color: lightpink;">用户名不能为空</label>
+                        </div>
                         <input type="password" name="pwd" class="pass_input" placeholder="请输入密码">
-                        <div class="pwd_error">输入错误</div>
+                        <div id="pwd_err" class="pwd_error">
+                            <label  style="color: lightpink;">密码不能为空</label>
+                        </div>
                         <div class="more_input clearfix">
                             <input type="checkbox" name="remember" {{ checked }}>
                             <label>记住用户名</label>

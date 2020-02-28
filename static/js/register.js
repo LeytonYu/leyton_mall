@@ -1,132 +1,141 @@
-$(function(){
+$(function () {
 
-	var error_name = false;
-	var error_password = false;
-	var error_check_password = false;
-	var error_email = false;
-	var error_check = false;
-
-
-	$('#user_name').blur(function() {
-		check_user_name();
-	});
-
-	$('#pwd').blur(function() {
-		check_pwd();
-	});
-
-	$('#cpwd').blur(function() {
-		check_cpwd();
-	});
-
-	$('#email').blur(function() {
-		check_email();
-	});
-
-	$('#allow').click(function() {
-		if($(this).is(':checked'))
-		{
-			error_check = false;
-			$(this).siblings('span').hide();
-		}
-		else
-		{
-			error_check = true;
-			$(this).siblings('span').html('请勾选同意');
-			$(this).siblings('span').show();
-		}
-	});
+    var error_name = true;
+    var error_password = true;
+    var error_check_password = true;
+    var error_email = true;
+    var error_check = false;
 
 
-	function check_user_name(){
-		var len = $('#user_name').val().length;
-		if(len<5||len>20)
-		{
-			$('#user_name').next().html('请输入5-20个字符的用户名')
-			$('#user_name').next().show();
-			error_name = true;
-		}
-		else
-		{
-			$('#user_name').next().hide();
-			error_name = false;
-		}
-	}
+    $('#user_name').blur(function () {
+        check_user_name();
+    });
 
-	function check_pwd(){
-		var len = $('#pwd').val().length;
-		if(len<8||len>20)
-		{
-			$('#pwd').next().html('密码最少8位，最长20位')
-			$('#pwd').next().show();
-			error_password = true;
-		}
-		else
-		{
-			$('#pwd').next().hide();
-			error_password = false;
-		}		
-	}
+    $('#pwd').blur(function () {
+        check_pwd();
+    });
 
+    $('#cpwd').blur(function () {
+        check_cpwd();
+    });
 
-	function check_cpwd(){
-		var pass = $('#pwd').val();
-		var cpass = $('#cpwd').val();
+    $('#email').blur(function () {
+        check_email();
+    });
 
-		if(pass!=cpass)
-		{
-			$('#cpwd').next().html('两次输入的密码不一致')
-			$('#cpwd').next().show();
-			error_check_password = true;
-		}
-		else
-		{
-			$('#cpwd').next().hide();
-			error_check_password = false;
-		}		
-		
-	}
+    $('#email').focus(function () {
+        $('#emali_err').slideUp("normal")
+    });
 
-	function check_email(){
-		var re = /^[a-z0-9][\w\.\-]*@[a-z0-9\-]+(\.[a-z]{2,5}){1,2}$/;
+    $('#user_name').focus(function () {
+        $('#name').slideUp("normal")
+    });
 
-		if(re.test($('#email').val()))
-		{
-			$('#email').next().hide();
-			error_email = false;
-		}
-		else
-		{
-			$('#email').next().html('你输入的邮箱格式不正确')
-			$('#email').next().show();
-			error_check_password = true;
-		}
+    $('#pwd').focus(function () {
+        $('#pwd_err').slideUp("normal")
+    });
 
-	}
+    $('#cpwd').focus(function () {
+        $('#cpwd_err').slideUp("normal")
+    });
 
+    $('#allow').click(function () {
+        if ($(this).is(':checked')) {
+            error_check = false;
+            $('#allow_err').slideUp("normal");
+        } else {
+            error_check = true;
+            $('#allow_err').slideDown("normal");
+        }
+    });
 
-	$('#reg_form').submit(function() {
-		check_user_name();
-		check_pwd();
-		check_cpwd();
-		check_email();
+    function check_user_name() {
+        var user_name = $('#user_name').val();
+        if (user_name == null || user_name === "") {
+            $('#name_err').find("label").text("用户名不能为空").css("color", "lightpink");
+            $('#name_err').slideDown('normal');
+            error_name = true;
+        } else {
+            $.ajax({
+                url: '/user/name_check/',
+                type: 'post',
+                dataType: 'json',
+                traditional: true,//这个参数必须添加，采用传统方式转换
+                data: {name: user_name},
+                async: false,
+                success: function (result) {
+                    if (result.resultCode == 0) {
+                        $('#name_err').slideUp('normal');
+                        error_name = false;
+                    } else {
+                        $('#name_err').slideDown('normal');
+                        error_name = true;
+                    }
+                }
+            });
+        }
+    }
 
-		if(error_name == false && error_password == false && error_check_password == false && error_email == false && error_check == false)
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-
-	});
+    function check_pwd() {
+        var len = $('#pwd').val().length;
+        if (len < 8 || len > 20) {
+            $('#pwd_err').slideDown('normal');
+            error_password = true;
+        } else {
+            $('#pwd_err').slideUp('normal');
+            error_password = false;
+        }
+    }
 
 
+    function check_cpwd() {
+        var pass = $('#pwd').val();
+        var cpass = $('#cpwd').val();
+
+        if (pass !== cpass) {
+            $('#cpwd_err').slideDown('normal');
+            error_check_password = true;
+        } else {
+            $('#cpwd_err').slideUp('normal');
+            error_check_password = false;
+        }
+
+    }
+
+    function check_email() {
+        var re = /^[a-zA-Z0-9][\w\.\-]*@[a-zA-Z0-9\-]+(\.[a-z]{2,5}){1,2}$/;
+
+        if (re.test($('#email').val())) {
+            $.ajax({
+                url: '/user/email_check/',
+                type: 'post',
+                dataType: 'json',
+                traditional: true,//这个参数必须添加，采用传统方式转换
+                data: {email: $('#email').val()},
+                async: false,
+                success: function (result) {
+                    if (result.resultCode == 0) {
+                        $('#emali_err').slideUp("normal");
+                        error_email = false;
+                    } else {
+                        $('#emali_err').find("label").text("邮箱重复了").css("color", "lightpink");
+                        $('#emali_err').slideDown("normal");
+                        error_check_password = true;
+                    }
+                }
+            });
+
+        } else {
+            $('#emali_err').find("label").text("邮箱格式不正确").css("color", "lightpink");
+            $('#emali_err').slideDown("normal");
+            error_check_password = true;
+
+        }
+
+    }
 
 
-
-
-
-
-})
+    $('form').submit(function () {
+        return error_name === false && error_password === false && error_check_password === false && error_email === false && error_check === false
+    });
+});

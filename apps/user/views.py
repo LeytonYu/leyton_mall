@@ -2,7 +2,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, reverse
 from django.views import View
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from itsdangerous import SignatureExpired
 from django.conf import settings
@@ -19,6 +20,23 @@ from django_redis import get_redis_connection
 
 # Create your views here.
 
+# /user/name_check
+@csrf_exempt
+def name_check(request):
+    """注册校验用户名是否重复"""
+    if len(User.objects.filter(username=request.POST.get('name'))) == 0:
+        return JsonResponse({'resultCode': 0})  # 没重复
+    return JsonResponse({'resultCode': 1})
+
+
+# /user/email_check
+@csrf_exempt
+def email_check(request):
+    if len(User.objects.filter(email=request.POST.get('email'))) == 0:
+        return JsonResponse({'resultCode': 0})  # 没重复
+    return JsonResponse({'resultCode': 1})
+
+
 # /user/register
 class RegisterView(View):
     """注册"""
@@ -29,6 +47,7 @@ class RegisterView(View):
 
     def post(self, request):
         """经行注册处理"""
+        print("提交注册请求")
         username = request.POST.get('user_name')
         password = request.POST.get('pwd')
         email = request.POST.get('email')
@@ -57,16 +76,7 @@ class RegisterView(View):
         info = {'confirm': user.id}
         token = serializer.dumps(info)
         token = token.decode()
-        # 发邮件
-        # """发送激活邮件"""
-        # subject = 'Leyton商城欢迎信息'
-        # message = '您的浏览器不支持此消息类型，请更换浏览器'
-        # html_message = message = '<h1>尊敬的{0},欢迎您注册Leyton商城会员</h1>请点击下面链接激活您的账户<br/>' \
-        #                          '<a href="http://127.0.0.1:8000/user/active/{1}">' \
-        #                          'http://127.0.0.1:8000/user/active/{2}</a>'.format(username, token, token)
-        # sender = settings.EMAIL_FROM
-        # receiver = [email]
-        # send_mail(subject, message, sender, receiver, html_message=html_message)
+
         print('发邮件前')
         # celery异步发邮件
         send_register_active_email.delay(email, username, token)
@@ -203,10 +213,10 @@ class UserOrderView(LoginRequiredMixin, View):
             page = 1
         # 获取当前页的Page实例对象
         order_page = paginator.page(page)
-        print('总页数：',num_pages,'当前页：',order_page.number)
+        print('总页数：', num_pages, '当前页：', order_page.number)
 
         if num_pages < 5:
-            pages = range(1, num_pages+1)
+            pages = range(1, num_pages + 1)
         elif page <= 3:
             pages = range(1, 6)
         elif num_pages - page <= 2:
@@ -272,4 +282,3 @@ class AddressView(LoginRequiredMixin, View):
 
         # 返回应答
         return redirect(reverse('user:address'))  # get的请求方式
-

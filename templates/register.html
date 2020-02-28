@@ -27,33 +27,44 @@
 					<li>
 						<label>用户名:</label>
 						<input type="text" name="user_name" id="user_name">
-						<span class="error_tip">提示信息</span>
+						<div id="name_err" class="error_tip">
+                            <label  style="color: lightpink;">用户名已存在</label>
+                        </div>
 					</li>					
 					<li>
 						<label>密码:</label>
 						<input type="password" name="pwd" id="pwd">
-						<span class="error_tip">提示信息</span>
+						<div id="pwd_err" class="error_tip" >
+                            <label  style="color: lightpink;">密码长度为8-20位</label>
+                        </div>
 					</li>
 					<li>
 						<label>确认密码:</label>
 						<input type="password" name="cpwd" id="cpwd">
-						<span class="error_tip">提示信息</span>
+						<div id="cpwd_err" class="error_tip">
+                            <label  style="color: lightpink;">两次密码不一致</label>
+                        </div>
 					</li>
 					<li>
 						<label>邮箱:</label>
 						<input type="text" name="email" id="email">
-						<span class="error_tip">提示信息</span>
+                        <div id="emali_err" class="error_tip">
+                            <label  style="color: lightpink;">邮箱格式不正确</label>
+                        </div>
+
 					</li>
 					<li class="agreement">
 						<input type="checkbox" name="allow" id="allow" checked="checked">
-						<label>同意”雷顿商城用户使用协议“</label>
-						<span class="error_tip2">提示信息</span>
+						<label>同意"雷顿商城用户使用协议"</label>
+						<div id="allow_err" class="error_tip2">
+                            <label  style="color: lightpink;">请勾选同意协议</label>
+                        </div>
 					</li>
 					<li class="reg_sub">
-						<input type="submit" value="注 册" name="">
+						<input type="submit" value="注 册" id="register_btn">
 					</li>
 				</ul>
-                    <span class="error_tip3">{{ errmsg }}</span>
+                    <label style="color: lightpink;">{{ errmsg }}</label>
 				</form>
 			</div>
 
