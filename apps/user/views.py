@@ -2,7 +2,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, reverse
 from django.views import View
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, QueryDict
 from django.views.decorators.csrf import csrf_exempt
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from itsdangerous import SignatureExpired
@@ -271,17 +271,17 @@ class AddressView(LoginRequiredMixin, View):
 
         # 数据校验
         if not all([receiver, addr, phone]):
-            return JsonResponse({'errmsg': '数据不完整'})
+            return JsonResponse({'message': '数据不完整'})
 
         # 校验手机号
         if not re.match(r'^1([3-8][0-9]|5[189]|8[6789])[0-9]{8}$', phone):
-            return JsonResponse({'errmsg': '手机号格式不合法'})
+            return JsonResponse({'message': '手机号格式不合法'})
         phone = int(phone)
         if zip_code:
             try:
                 zip_code = int(zip_code)
             except:
-                return JsonResponse({'errmsg': '邮编格式不合法'})
+                return JsonResponse({'message': '邮编格式不合法'})
         # 添加
         Address.objects.create(user=user,
                                receiver=receiver,
@@ -297,18 +297,27 @@ class AddressView(LoginRequiredMixin, View):
         return JsonResponse({'message': '成功'})
         # return redirect(reverse('user:address'))  # get的请求方式
 
-    def pull(self, request):
+    def put(self, request):
         """修改地址"""
         id = request.POST.get('id')
+        receiver = request.POST.get('receiver')
+        province = request.POST.get('province', '浙江省')
+        city = request.POST.get('city', '绍兴市')
+        area = request.POST.get('area', '诸暨市')
+        addr = request.POST.get('addr')
+        zip_code = request.POST.get('zip_code')
+        phone = request.POST.get('phone')
+        user = request.user
         if Address.objects.update_address(id, **request.POST):
             return JsonResponse({'message': 'success'})
         else:
-            return JsonResponse({'errmsg': 'fail'})
+            return JsonResponse({'message': 'fail'})
 
     def delete(self, request):
         """删除地址"""
-        id = request.POST.get('id')
+        DELETE = QueryDict(request.body)
+        id = eval(list(dict(DELETE.lists()).keys())[0])['id']
         if Address.objects.del_address(id):
             return JsonResponse({'message': 'success'})
         else:
-            return JsonResponse({'errmsg': 'fail'})
+            return JsonResponse({'message': 'fail'})
