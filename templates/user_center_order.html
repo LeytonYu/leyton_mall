@@ -13,7 +13,7 @@
             <table class="order_list_table w980">
                 <tbody>
                 <tr>
-                    <td width="55%">
+                    <td width="50%">
                         {% for good in order.order_goods %}
                             <ul class="order_goods_list clearfix">
                                 <li class="col01"><a href="{% url 'goods:detail' good.sku.id%}" ><img src="{{ good.sku.image.url }}"></a></li>
@@ -23,7 +23,7 @@
                             </ul>
                         {% endfor %}
                     </td>
-                    <td width="15%">{{ order.total_price|add:order.total_freight }}(含运费:{{ order.total_freight }})元</td>
+                    <td width="20%">{{ order.total_price|add:order.total_freight }}(含运费:{{ order.total_freight }})元</td>
                     <td width="15%">{{ order.status_name }}</td>
                     <td width="15%"><a href="#" order_id="{{ order.order_id }}" status="{{ order.order_status }}"class="oper_btn">去付款</a></td>
                 </tr>

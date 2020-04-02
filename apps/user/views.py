@@ -241,8 +241,16 @@ class AddressView(LoginRequiredMixin, View):
         """显示"""
         user = request.user
         address = Address.objects.get_default_address(user)
-        return render(request, 'user_center_site.html',
-                      {'title': '用户中心-收货地址', 'page': 'address', 'address': address})
+        address_all = Address.objects.get_all_address(user)
+        count = len(address_all)
+        context = {
+            'title': '用户中心-收货地址',
+            'page': 'address',
+            'address': address,
+            'count': count,
+            'address_all': address_all,
+        }
+        return render(request, 'user_center_site.html', context)
 
     def post(self, request):
         # 地址添加
@@ -252,7 +260,8 @@ class AddressView(LoginRequiredMixin, View):
         phone = request.POST.get('phone')
         user = request.user
         address = Address.objects.get_default_address(user)
-
+        address_all = Address.objects.get_all_address(user)
+        count = len(address_all)
         if address:
             is_default = False
         else:
@@ -263,6 +272,8 @@ class AddressView(LoginRequiredMixin, View):
             return render(request, 'user_center_site.html',
                           {'page': 'address',
                            'address': address,
+                           'count': count,
+                           'address_all': address_all,
                            'errmsg': '数据不完整'})
 
         # 校验手机号
@@ -270,8 +281,20 @@ class AddressView(LoginRequiredMixin, View):
             return render(request, 'user_center_site.html',
                           {'page': 'address',
                            'address': address,
+                           'count': count,
+                           'address_all': address_all,
                            'errmsg': '手机号格式不合法'})
-
+        phone = int(phone)
+        if zip_code:
+            try:
+                zip_code = int(zip_code)
+            except:
+                return render(request, 'user_center_site.html',
+                              {'page': 'address',
+                               'address': address,
+                               'count': count,
+                               'address_all': address_all,
+                               'errmsg': '邮编格式不合法'})
         # 添加
         Address.objects.create(user=user,
                                receiver=receiver,

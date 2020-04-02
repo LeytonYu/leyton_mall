@@ -25,7 +25,7 @@ class GoodsSKU(BaseModel):
     status_choice = (
         (0, '下线'),
         (1, '上线')
-    )
+    )   # 后期可以扩充状态
     type = models.ForeignKey('GoodsType', on_delete=models.CASCADE, verbose_name='商品种类')
     goods = models.ForeignKey('Goods', on_delete=models.CASCADE, verbose_name='商品SPU')
     name = models.CharField(max_length=100, verbose_name='商品名称')
@@ -54,7 +54,7 @@ class Goods(BaseModel):
     detail = HTMLField(blank=True, verbose_name='商品详情')
 
     class Meta:
-        db_table = 'lm_goods'
+        db_table = 'lm_goods_spu'
         verbose_name = '商品SPU'
         verbose_name_plural = verbose_name
 

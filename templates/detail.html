@@ -2,7 +2,7 @@
 {% load static %}
 {% block title %}雷顿商城-商品详情{% endblock title %}
 {% block main_content %}
-    <div class="breadcrumb">
+    <div class="breadcrumb" xmlns="http://www.w3.org/1999/html">
         <a href="#">全部分类</a>
         <span>></span>
         <a href="{% url 'goods:list' sku.type_id 1%}">{{ sku.type.name }}</a>
@@ -11,7 +11,7 @@
     </div>
 
     <div class="goods_detail_con clearfix">
-        <div class="goods_detail_pic fl"><img src="{{ sku.image.url }}" height="200" width="200"></div>
+        <div class="goods_detail_pic fl"><img src="{{ sku.image.url }}" ></div>
 
         <div class="goods_detail_list fr">
             <h3>{{ sku.name }}</h3>
@@ -30,7 +30,7 @@
             </div>
             <div>
                 <div>其他规格:</div>
-                <div>
+                <div class="other_spc">
                     {% for sku in same_spu_skus %}
                         <a href="{% url 'goods:detail' sku.id %}">{{ sku.name }}</a>
                     {% endfor %}
@@ -76,14 +76,18 @@
             </div>
 
             <div class="tab_content" id="tab_comment" style="display: none;">
-                <dl>
+
                     {% for sku in sku_orders %}
-                        <dt>评论时间: {{ sku.update_time }} 用户名:{{ sku.order.user.username }}</dt>
-                        <dd>评论内容: {{ sku.comment }}</dd>
+                        <dd></dd>
+                        <div class="comment_title">
+                        <span class="comment_name">用户:{{ sku.order.user.username }} </span>
+                        <span class="comment_time">{{ sku.update_time }} </span>
+                        </div>
+                        <dd>{{ sku.comment }}</dd>
                     {% empty %}
                         暂时没有评论信息
                     {% endfor %}
-                </dl>
+
             </div>
 
         </div>

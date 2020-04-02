@@ -29,14 +29,53 @@ class AddressManager(models.Manager):
 
         return address
 
+    def get_all_address(self, user):
+        """获取用户的所有收货地址"""
+        address = self.filter(user=user)
+        return address
+
+    def update_address(self, id, **kwargs):
+        """修改用户的收货地址"""
+        try:
+            address = self.get(id)
+            address.receiver = kwargs.get('receiver')
+            address.addr = kwargs.get('addr')
+            address.zip_code = kwargs.get('zip_code')
+            address.phone = kwargs.get('phone')
+            address.save()
+            return True
+        except:
+            return False
+
+    def del_address(self, id):
+        """删除地址"""
+        try:
+            self.get(id).delete()
+            return True
+        except:
+            return False
+
+    def set_default(self, user, id):
+        """设置默认地址"""
+        try:
+            address = self.get(id)
+            address2 = self.get(user=user, is_default=True)
+            address.is_default = True
+            address2.is_default = False
+            address.save()
+            address2.save()
+            return True
+        except:
+            return False
+
 
 class Address(BaseModel):
     """地址模型类"""
     user = models.ForeignKey('User', on_delete=models.CASCADE, verbose_name='所属账户')
     receiver = models.CharField(max_length=20, verbose_name='收件人')
     addr = models.CharField(max_length=256, verbose_name='收件地址')
-    zip_code = models.CharField(max_length=6, null=True, verbose_name='邮政编码')
-    phone = models.CharField(max_length=11, verbose_name='联系电话')
+    zip_code = models.IntegerField(null=True, verbose_name='邮政编码')
+    phone = models.IntegerField(verbose_name='联系电话')
     is_default = models.BooleanField(default=False, verbose_name='是否默认')
     # 自定义一个模型管理器类
     objects = AddressManager()
