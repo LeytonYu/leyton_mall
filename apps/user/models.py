@@ -73,6 +73,9 @@ class Address(BaseModel):
     """地址模型类"""
     user = models.ForeignKey('User', on_delete=models.CASCADE, verbose_name='所属账户')
     receiver = models.CharField(max_length=20, verbose_name='收件人')
+    province = models.CharField(max_length=20, verbose_name='省')
+    city = models.CharField(max_length=20, verbose_name='市')
+    area = models.CharField(max_length=20, verbose_name='区')
     addr = models.CharField(max_length=256, verbose_name='收件地址')
     zip_code = models.IntegerField(null=True, verbose_name='邮政编码')
     phone = models.IntegerField(verbose_name='联系电话')
