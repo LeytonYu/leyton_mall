@@ -253,15 +253,17 @@ class AddressView(LoginRequiredMixin, View):
         return render(request, 'user_center_site.html', context)
 
     def post(self, request):
-        # 地址添加
+        """地址添加"""
         receiver = request.POST.get('receiver')
+        province = request.POST.get('province', '浙江省')
+        city = request.POST.get('city', '绍兴市')
+        area = request.POST.get('area', '诸暨市')
+        print(area)
         addr = request.POST.get('addr')
         zip_code = request.POST.get('zip_code')
         phone = request.POST.get('phone')
         user = request.user
         address = Address.objects.get_default_address(user)
-        address_all = Address.objects.get_all_address(user)
-        count = len(address_all)
         if address:
             is_default = False
         else:
@@ -269,39 +271,44 @@ class AddressView(LoginRequiredMixin, View):
 
         # 数据校验
         if not all([receiver, addr, phone]):
-            return render(request, 'user_center_site.html',
-                          {'page': 'address',
-                           'address': address,
-                           'count': count,
-                           'address_all': address_all,
-                           'errmsg': '数据不完整'})
+            return JsonResponse({'errmsg': '数据不完整'})
 
         # 校验手机号
         if not re.match(r'^1([3-8][0-9]|5[189]|8[6789])[0-9]{8}$', phone):
-            return render(request, 'user_center_site.html',
-                          {'page': 'address',
-                           'address': address,
-                           'count': count,
-                           'address_all': address_all,
-                           'errmsg': '手机号格式不合法'})
+            return JsonResponse({'errmsg': '手机号格式不合法'})
         phone = int(phone)
         if zip_code:
             try:
                 zip_code = int(zip_code)
             except:
-                return render(request, 'user_center_site.html',
-                              {'page': 'address',
-                               'address': address,
-                               'count': count,
-                               'address_all': address_all,
-                               'errmsg': '邮编格式不合法'})
+                return JsonResponse({'errmsg': '邮编格式不合法'})
         # 添加
         Address.objects.create(user=user,
                                receiver=receiver,
+                               province=province,
+                               city=city,
+                               area=area,
                                addr=addr,
                                zip_code=zip_code,
                                phone=phone,
                                is_default=is_default)
 
         # 返回应答
-        return redirect(reverse('user:address'))  # get的请求方式
+        return JsonResponse({'message': '成功'})
+        # return redirect(reverse('user:address'))  # get的请求方式
+
+    def pull(self, request):
+        """修改地址"""
+        id = request.POST.get('id')
+        if Address.objects.update_address(id, **request.POST):
+            return JsonResponse({'message': 'success'})
+        else:
+            return JsonResponse({'errmsg': 'fail'})
+
+    def delete(self, request):
+        """删除地址"""
+        id = request.POST.get('id')
+        if Address.objects.del_address(id):
+            return JsonResponse({'message': 'success'})
+        else:
+            return JsonResponse({'errmsg': 'fail'})
