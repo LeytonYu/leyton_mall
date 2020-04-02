@@ -39,6 +39,9 @@ class AddressManager(models.Manager):
         try:
             address = self.get(id)
             address.receiver = kwargs.get('receiver')
+            address.province = kwargs.get('province')
+            address.city = kwargs.get('city')
+            address.area = kwargs.get('area')
             address.addr = kwargs.get('addr')
             address.zip_code = kwargs.get('zip_code')
             address.phone = kwargs.get('phone')

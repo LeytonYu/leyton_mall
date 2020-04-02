@@ -255,9 +255,9 @@ class AddressView(LoginRequiredMixin, View):
     def post(self, request):
         """地址添加"""
         receiver = request.POST.get('receiver')
-        province = request.POST.get('province','浙江省')
-        city = request.POST.get('city','绍兴市')
-        area = request.POST.get('area','诸暨市')
+        province = request.POST.get('province', '浙江省')
+        city = request.POST.get('city', '绍兴市')
+        area = request.POST.get('area', '诸暨市')
         print(area)
         addr = request.POST.get('addr')
         zip_code = request.POST.get('zip_code')
@@ -299,9 +299,16 @@ class AddressView(LoginRequiredMixin, View):
 
     def pull(self, request):
         """修改地址"""
-        # Address.objects.update_address(id,**dic)
-        pass
+        id = request.POST.get('id')
+        if Address.objects.update_address(id, **request.POST):
+            return JsonResponse({'message': 'success'})
+        else:
+            return JsonResponse({'errmsg': 'fail'})
 
     def delete(self, request):
         """删除地址"""
-        pass
+        id = request.POST.get('id')
+        if Address.objects.del_address(id):
+            return JsonResponse({'message': 'success'})
+        else:
+            return JsonResponse({'errmsg': 'fail'})
