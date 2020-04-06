@@ -6,9 +6,9 @@
     <script type="text/javascript" src="{% static 'js/location.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/select2.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/select2_locale_zh-CN.js' %}"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-    <script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
-    <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+    <script type="text/javascript" src="{% static 'js/vue.js' %}"></script>
+    <script src="{% static 'js/vue-resource.min.js' %}"></script>
+    <script src="{% static 'js/vue-router.js' %}"></script>
     <link rel="stylesheet" type="text/css" href="{% static 'css/select2.css' %}">
 {% endblock %}
 {% block right_content %}
@@ -19,7 +19,8 @@
             <dl>
                 <dt>当前地址：</dt>
                 {% if address %}
-                    <dd>{{ address.addr }} （{{ address.receiver }} 收） {{ address.phone }}</dd>
+                    <dd>{{ address.province }} {{ address.city }} {{ address.area }} {{ address.addr }}
+                        （{{ address.receiver }} 收） {{ address.phone }}</dd>
                 {% else %}
                     <dd>无</dd>
                 {% endif %}
@@ -55,7 +56,7 @@
                     <label>手机：</label>
                     <input type="text" name="phone" required v-model="phone">
                 </div>
-                <input v-if="!commitPost" type="button" value="取消修改" @click="cancel">
+                <input v-if="!commitPost" type="button" value="取消修改" class="info_submit" @click="cancel">
                 <input type="button" id="addr_sub" value="提交" class="info_submit" @click="commit()">
             </form>
         </div>
@@ -73,13 +74,15 @@
                 {% for address in address_all %}
                     <ul class="address_list_th">
                         <li class="col01">{{ address.receiver }}</li>
-                        <li class="col02">{{ address.addr }}</li>
-                        <li class="col03">{{ address.zip_code }}</li>
+                        <li class="col02">{{ address.province }} {{ address.city }} {{ address.area }} {{ address.addr }}</li>
+                        <li class="col03">{% if address.zip_code %} {{ address.zip_code }}{% else %}无{% endif %}</li>
                         <li class="col04">{{ address.phone }}</li>
                         <li class="col05">
                             <div class="num_add">
                                 <a href="javascript:"
-                                   @click.prevent="Modify('{{ address.id }}','{{ address.receiver }}','{{ address.addr }}','{{ address.zip_code }}','{{ address.phone }}')">修改</a>
+                                   @click.prevent="Modify('{{ address.id }}','{{ address.receiver }}','{{ address.province }}',
+                                   '{{ address.city }}','{{ address.area }}','{{ address.addr }}',
+                                   '{{ address.zip_code }}','{{ address.phone }}')">修改</a>
                                 <a href="javascript:" @click.prevent="Delete({{ address.id }})">删除</a>
                             </div>
                         </li>
@@ -87,7 +90,7 @@
                             {% if address.is_default %}
                                 默认地址
                             {% else %}
-                                <a href="javascript:">设为默认</a>
+                                <a href="javascript:" @click.prevent="SetDef({{ address.id }})">设为默认</a>
                             {% endif %}
                         </li>
                     </ul>
@@ -95,6 +98,10 @@
             </div>
         {% endif %}
     </div>
+
+{% endblock right_content %}
+{# js块 #}
+{% block bottomfiles %}
     <script>
         var vue = new Vue({
             delimiters: ["[[", "]]"],
@@ -110,25 +117,35 @@
             },
             methods: {
                 commit(id) {
+                    var csrf = $('input[name="csrfmiddlewaretoken"]').val()
                     var province = document.getElementById("loc_province")
                     var city = document.getElementById("loc_city")
                     var town = document.getElementById("loc_town")
                     province = province.options[province.selectedIndex].text
                     city = city.options[city.selectedIndex].text
                     town = town.options[town.selectedIndex].text
+                    if (this.receiver == "") {
+                        alert("接收人不能为空");
+                        return false;
+                    }
+
                     if (province == '省份' || city == '地级市' || town == '市、县、区') {
                         alert("地区有误，请重填");
                         return false;
                     }
+                    if (this.address == "") {
+                        alert("详细地址不能为空");
+                        return false;
+                    }
                     if (!(/^1[3456789]\d{9}$/.test(this.phone))) {
-                        alert("用手机号有误，请重填");
+                        alert("手机号格式有误，请重填");
                         return false;
                     }
 
                     if (this.commitPost) {//如果是添加，调用此处ajax
                         this.$http
                             .post(
-                                "http://127.0.0.1:8000/user/address/",
+                                "/user/address/",
                                 {
                                     receiver: this.receiver,
                                     province: province,
@@ -137,13 +154,13 @@
                                     addr: this.address,
                                     zip_code: this.zip_code,
                                     phone: this.phone,
-                                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                                    csrfmiddlewaretoken: csrf
                                 },
                                 {emulateJSON: true}
                             )
                             .then(
                                 response => {
-                                    if (response.body.message == "成功") {
+                                    if (response.body.message == "success") {
                                         alert("添加成功");
                                         history.go(0)
                                     } else {
@@ -156,116 +173,18 @@
                             );
                     } else {//否则用修改
                         var form = {
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            body: {
-                                id: this.id,
-                                receiver: this.receiver,
-                                province: province,
-                                city: city,
-                                area: town,
-                                addr: this.address,
-                                zip_code: this.zip_code,
-                                phone: this.phone,
-                                csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                                "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            },
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            headers: {
-                                 "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            },
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            "X-CSRFToken": this.getCookie("csrftoken"),
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
-                            csrfmiddlewaretoken: '{{ csrf_token }}',
+                            id: this.id,
+                            receiver: this.receiver,
+                            province: province,
+                            city: city,
+                            area: town,
+                            addr: this.address,
+                            zip_code: this.zip_code,
+                            phone: this.phone,
                         }
                         this.$http
                             .put(
-                                "http://127.0.0.1:8000/user/address/",
+                                "/user/address/",
                                 form,
                                 {emulateJSON: true,}
                             )
@@ -286,10 +205,10 @@
 
                 },
                 Delete(id) {
-                    if (confirm("确认要删除？" + id)) {
+                    if (confirm("确认要删除吗？")) {
                         this.$http
                             .delete(
-                                "http://127.0.0.1:8000/user/address/",
+                                "/user/address/",
                                 {
                                     body: {
                                         id: id,
@@ -317,14 +236,46 @@
                             );
                     }
                 },
-                Modify(id, receiver, addr, zip_code, phone) {
+                SetDef(id) {
+                    var csrf = $('input[name="csrfmiddlewaretoken"]').val()
+                    this.$http
+                        .post(
+                            "/user/setdef/",
+                            {
+                                id: id,
+                                csrfmiddlewaretoken: csrf
+                            },
+                            {emulateJSON: true,}
+                        )
+                        .then(
+                            response => {
+                                if (response.body.message == "success") {
+                                    alert("设置成功")
+                                    history.go(0)
+                                } else {
+                                    alert(response.body.message);
+                                }
+                            },
+                            response => {
+                                alert("服务器维护中");
+                            }
+                        );
+                },
+                Modify(id, receiver, province, city, area, addr, zip_code, phone) {
                     console.log(id, receiver, addr, zip_code, phone)
                     this.receiver = receiver
                     this.address = addr
-                    this.zip_code = zip_code
+                    if (zip_code == "无") {
+                        this.zip_code = zip_code
+                    } else {
+                        this.zip_code = ''
+                    }
                     this.phone = phone
                     this.id = id
                     this.commitPost = false
+                    $('#select2-chosen-1').text(province)
+                    $('#select2-chosen-2').text(city)
+                    $('#select2-chosen-3').text(area)
                 },
                 getCookie: function (cname) {
                     var name = cname + "=";
@@ -346,6 +297,9 @@
                     this.zip_code = ""
                     this.phone = ""
                     this.commitPost = true
+                    $('#select2-chosen-1').text("省份")
+                    $('#select2-chosen-2').text("地级市")
+                    $('#select2-chosen-3').text("市、县、区")
                 }
 
             },
@@ -360,4 +314,4 @@
             }
         });
     </script>
-{% endblock right_content %}
+{% endblock %}

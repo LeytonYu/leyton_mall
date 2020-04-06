@@ -20,37 +20,63 @@ class OrderPlaceView(LoginRequiredMixin, View):
     def post(self, request):
         user = request.user
         sku_ids = request.POST.getlist('sku_id')
+        count = request.POST.get("sku_count")
         if not sku_ids:
             return redirect(reverse('cart:show'))
-        conn = get_redis_connection('default')
-        cart_key = 'cart_%d' % user.id
-
-        total_count = 0
-        total_price = 0
-        total_freight = 0
-        skus = []
-        for sku_id in sku_ids:
-            sku = GoodsSKU.objects.get(id=sku_id)
-            count = int(conn.hget(cart_key, sku_id))
-            amount = sku.price * count
-            sku.count = count
-            sku.amount = amount
-            total_count += count
-            total_price += amount
-            skus.append(sku)
-            total_freight += sku.freight
-        total_pay = total_price + total_freight
         address = Address.objects.filter(user=user)
-        sku_ids = ','.join(sku_ids)
-        context = {
-            'address': address,
-            'total_count': total_count,
-            'total_price': total_price,
-            'total_freight': total_freight,
-            'total_pay': total_pay,
-            'skus': skus,
-            'sku_ids': sku_ids,
-        }
+        if count:
+            try:
+                count = int(count)
+                sku = GoodsSKU.objects.get(id=sku_ids[0])
+                conn = get_redis_connection('default')
+                cart_key = 'cart_%d' % user.id
+                conn.hset(cart_key, sku.id, count)
+                amount = sku.price * count
+                sku.count = count
+                sku.amount = amount
+                context = {
+                    'address': address,
+                    'total_count': count,
+                    'total_price': amount,
+                    'total_freight': sku.freight,
+                    'total_pay':amount+sku.freight,
+                    'skus': [sku],
+                    'sku_ids': sku_ids[0],
+                }
+            except:
+                if sku_ids:
+                    return redirect(reverse('goods:detail'+sku_ids[0]))
+                else:
+                    return redirect(reverse('goods:index'))
+        else:
+            conn = get_redis_connection('default')
+            cart_key = 'cart_%d' % user.id
+
+            total_count = 0
+            total_price = 0
+            total_freight = 0
+            skus = []
+            for sku_id in sku_ids:
+                sku = GoodsSKU.objects.get(id=sku_id)
+                count = int(conn.hget(cart_key, sku_id))
+                amount = sku.price * count
+                sku.count = count
+                sku.amount = amount
+                total_count += count
+                total_price += amount
+                skus.append(sku)
+                total_freight += sku.freight
+            total_pay = total_price + total_freight
+            sku_ids = ','.join(sku_ids)
+            context = {
+                'address': address,
+                'total_count': total_count,
+                'total_price': total_price,
+                'total_freight': total_freight,
+                'total_pay': total_pay,
+                'skus': skus,
+                'sku_ids': sku_ids,
+            }
         return render(request, 'place_order.html', context)
 
 

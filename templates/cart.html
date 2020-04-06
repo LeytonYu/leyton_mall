@@ -17,8 +17,10 @@
         {% for sku in skus %}
             <ul class="cart_list_td clearfix">
                 <li class="col01"><input type="checkbox" name="sku_id" value="{{ sku.id }}" checked></li>
-                <li class="col02"><img src="{{ sku.image.url }}"></li>
-                <li class="col03">{{ sku.name }}<br><em>{{ sku.price }}元/{{ sku.unite }}</em></li>
+                <li class="col02"><a href="{% url 'goods:detail' sku.id %}" >
+                    <img src="{{ sku.image.url }}"></a></li>
+                <li class="col03"><a href="{% url 'goods:detail' sku.id %}" >{{ sku.name }}
+                    <br><em>{{ sku.price }}元/{{ sku.unite }}</em></a></li>
                 <li class="col04">{{ sku.unite }}</li>
                 <li class="col05">{{ sku.price }} 元</li>
                 <li class="col06">

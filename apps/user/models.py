@@ -34,17 +34,18 @@ class AddressManager(models.Manager):
         address = self.filter(user=user)
         return address
 
-    def update_address(self, id, **kwargs):
+    def update_address(self, id, receiver, province, city, area, addr,
+                                          zip_code, phone):
         """修改用户的收货地址"""
         try:
-            address = self.get(id)
-            address.receiver = kwargs.get('receiver')
-            address.province = kwargs.get('province')
-            address.city = kwargs.get('city')
-            address.area = kwargs.get('area')
-            address.addr = kwargs.get('addr')
-            address.zip_code = kwargs.get('zip_code')
-            address.phone = kwargs.get('phone')
+            address = self.get(id=id)
+            address.receiver = receiver
+            address.province = province
+            address.city = city
+            address.area = area
+            address.addr = addr
+            address.zip_code = zip_code
+            address.phone = phone
             address.save()
             return True
         except:
@@ -52,24 +53,26 @@ class AddressManager(models.Manager):
 
     def del_address(self, id):
         """删除地址"""
-        try:
-            self.get(id).delete()
-            return True
-        except:
-            return False
+        return  self.filter(id=id).delete()
 
     def set_default(self, user, id):
         """设置默认地址"""
         try:
-            address = self.get(id)
             address2 = self.get(user=user, is_default=True)
-            address.is_default = True
             address2.is_default = False
-            address.save()
             address2.save()
-            return True
-        except:
+        except Exception:
+            pass
+
+        try:
+            address = self.get(id=id)
+            address.is_default = True
+        except Exception:
             return False
+
+
+        address.save()
+        return True
 
 
 class Address(BaseModel):

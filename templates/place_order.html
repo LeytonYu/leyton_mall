@@ -8,7 +8,8 @@
         <dl>
             <dt>寄送到：</dt>
             {% for addr in address %}
-                <dd><input type="radio" name="addr_id" value="{{ addr.id }}" {% if addr.is_default %}checked{% endif %}>{{ addr.addr }}
+                <dd><input type="radio" name="addr_id" value="{{ addr.id }}" {% if addr.is_default %}checked{% endif %}>
+                    {{ addr.province }} {{ addr.city }} {{ addr.area }} {{ addr.addr }}
                     （{{ addr.receiver }} 收） {{ addr.phone }}
                 </dd>
             {% empty %}
