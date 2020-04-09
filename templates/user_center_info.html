@@ -7,7 +7,8 @@
                 <li><span>用户名：</span>{{ user.username }}</li>
                 {% if address %}
                     <li><span>联系方式：</span>{{ address.phone }}</li>
-                    <li><span>联系地址：</span>{{ address.addr }}</li>
+                    <li><span>联系地址：</span>{{ address.province }}
+                        {{ address.city }} {{ address.area }} {{ address.addr }}</li>
                 {% else %}
                     <li><span>联系方式：</span>无</li>
                     <li><span>联系地址：</span>无</li>

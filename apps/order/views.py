@@ -20,43 +20,70 @@ class OrderPlaceView(LoginRequiredMixin, View):
     def post(self, request):
         user = request.user
         sku_ids = request.POST.getlist('sku_id')
+        count = request.POST.get("sku_count")
         if not sku_ids:
             return redirect(reverse('cart:show'))
-        conn = get_redis_connection('default')
-        cart_key = 'cart_%d' % user.id
-
-        total_count = 0
-        total_price = 0
-        total_freight = 0
-        skus = []
-        for sku_id in sku_ids:
-            sku = GoodsSKU.objects.get(id=sku_id)
-            count = int(conn.hget(cart_key, sku_id))
-            amount = sku.price * count
-            sku.count = count
-            sku.amount = amount
-            total_count += count
-            total_price += amount
-            skus.append(sku)
-            total_freight += sku.freight
-        total_pay = total_price + total_freight
         address = Address.objects.filter(user=user)
-        sku_ids=','.join(sku_ids)
-        context = {
-            'address': address,
-            'total_count': total_count,
-            'total_price': total_price,
-            'total_freight': total_freight,
-            'total_pay': total_pay,
-            'skus': skus,
-            'sku_ids':sku_ids,
-        }
+        if count:
+            try:
+                count = int(count)
+                sku = GoodsSKU.objects.get(id=sku_ids[0])
+                conn = get_redis_connection('default')
+                cart_key = 'cart_%d' % user.id
+                conn.hset(cart_key, sku.id, count)
+                amount = sku.price * count
+                sku.count = count
+                sku.amount = amount
+                context = {
+                    'address': address,
+                    'total_count': count,
+                    'total_price': amount,
+                    'total_freight': sku.freight,
+                    'total_pay':amount+sku.freight,
+                    'skus': [sku],
+                    'sku_ids': sku_ids[0],
+                }
+            except:
+                if sku_ids:
+                    return redirect(reverse('goods:detail'+sku_ids[0]))
+                else:
+                    return redirect(reverse('goods:index'))
+        else:
+            conn = get_redis_connection('default')
+            cart_key = 'cart_%d' % user.id
+
+            total_count = 0
+            total_price = 0
+            total_freight = 0
+            skus = []
+            for sku_id in sku_ids:
+                sku = GoodsSKU.objects.get(id=sku_id)
+                count = int(conn.hget(cart_key, sku_id))
+                amount = sku.price * count
+                sku.count = count
+                sku.amount = amount
+                total_count += count
+                total_price += amount
+                skus.append(sku)
+                total_freight += sku.freight
+            total_pay = total_price + total_freight
+            sku_ids = ','.join(sku_ids)
+            context = {
+                'address': address,
+                'total_count': total_count,
+                'total_price': total_price,
+                'total_freight': total_freight,
+                'total_pay': total_pay,
+                'skus': skus,
+                'sku_ids': sku_ids,
+            }
         return render(request, 'place_order.html', context)
 
 
 # /order/commit
 class OrderCommintView(View):
     """提交订单"""
+
     @transaction.atomic
     def post(self, request):
         user = request.user
@@ -83,7 +110,7 @@ class OrderCommintView(View):
         total_freight = 0
 
         # 设置事务保存点
-        save_id=transaction.savepoint()
+        save_id = transaction.savepoint()
 
         try:
             order = OrderInfo.objects.create(order_id=order_id,
@@ -115,16 +142,16 @@ class OrderCommintView(View):
                 sku.stock -= count
                 sku.sales += count
                 sku.save()
-                total_freight+=sku.freight
-                total_price+=sku.price*count
-                total_count+=count
+                total_freight += sku.freight
+                total_price += sku.price * count
+                total_count += count
 
                 # print('user:%d stock:%d' % (user.id, sku.stock))
                 # import time
                 # time.sleep(10)
-            order.total_count=total_count
-            order.total_price=total_price
-            order.total_freight=total_freight
+            order.total_count = total_count
+            order.total_price = total_price
+            order.total_freight = total_freight
             order.save()
         except Exception:
             print(Exception)
@@ -139,13 +166,14 @@ class OrderCommintView(View):
 # /order/pay
 class OrderPayView(View):
     """订单支付"""
+
     def post(self, request):
         user = request.user
         if not user.is_authenticated:
             return JsonResponse({'res': 0, 'errmsg': '用户未登录'})
 
         order_id = request.POST.get('order_id')
-        print('订单id：',order_id,'用户id',user.id)
+        print('订单id：', order_id, '用户id', user.id)
         if not order_id:
             return JsonResponse({'res': 1, 'errmsg': '无效的订单'})
 
@@ -194,6 +222,7 @@ class OrderPayView(View):
 # /order/check
 class OrderCheckView(View):
     """查看订单支付结果"""
+
     def post(self, request):
         user = request.user
         if not user.is_authenticated:
@@ -272,48 +301,50 @@ class OrderCheckView(View):
                 # 支付出错
                 return JsonResponse({'res': 4, 'errmsg': '支付失败'})
 
+
 # /order/comment
-class OrderCommentView(LoginRequiredMixin,View):
+class OrderCommentView(LoginRequiredMixin, View):
     """评论相关"""
-    def get(self,request,order_id):
+
+    def get(self, request, order_id):
         """处理评论"""
-        user=request.user
+        user = request.user
         if not order_id:
-            return  redirect(reverse('user:order'))
+            return redirect(reverse('user:order'))
         try:
-            order=OrderInfo.objects.get(order_id=order_id,user=user)
+            order = OrderInfo.objects.get(order_id=order_id, user=user)
         except OrderInfo.DoesNotExist:
             return redirect(reverse('user:order'))
 
-        order.status_name=OrderInfo.ORDER_STATUS[order.order_status]
+        order.status_name = OrderInfo.ORDER_STATUS[order.order_status]
 
-        order_goods=OrderGoods.objects.filter(order_id=order_id)
+        order_goods = OrderGoods.objects.filter(order_id=order_id)
         for order_good in order_goods:
-            order_good.amount=order_good.price*order_good.count
+            order_good.amount = order_good.price * order_good.count
 
-        order.order_goods=order_goods
-        return render(request,'order_comment.html',{'order':order})
+        order.order_goods = order_goods
+        return render(request, 'order_comment.html', {'order': order})
 
-    def post(self,request,order_id):
+    def post(self, request, order_id):
         """订单评论提交"""
         if not order_id:
-            return redirect(reverse('user:order',kwargs={'page':1}))
+            return redirect(reverse('user:order', kwargs={'page': 1}))
         try:
-            order=OrderInfo.objects.get(order_id=order_id)
+            order = OrderInfo.objects.get(order_id=order_id)
         except Exception:
-            return redirect(reverse('user:order',kwargs={'page':1}))
-        total_count=int(request.POST.get('total_count'))
+            return redirect(reverse('user:order', kwargs={'page': 1}))
+        total_count = int(request.POST.get('total_count'))
 
-        for i in range(1,total_count+1):
-            sku_id=request.POST.get("sku_%d"%i)
-            comment=request.POST.get('content_%d'%i)
+        for i in range(1, total_count + 1):
+            sku_id = request.POST.get("sku_%d" % i)
+            comment = request.POST.get('content_%d' % i)
             try:
-                order_good=OrderGoods.objects.get(order=order,sku_id=sku_id)
-                order_good.comment=comment
+                order_good = OrderGoods.objects.get(order=order, sku_id=sku_id)
+                order_good.comment = comment
                 order_good.save()
             except Exception:
                 print(Exception)
 
-        order.order_status=5
+        order.order_status = 5
         order.save()
-        return redirect(reverse('user:order',kwargs={'page':1}))
+        return redirect(reverse('user:order', kwargs={'page': 1}))

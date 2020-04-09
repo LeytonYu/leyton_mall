@@ -71,7 +71,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'leyton_mall',
-        'HOST': 'yldatomic.cn',
+        'HOST': '106.54.124.9',
         'PORT': 3306,
         'USER': 'root',
         'PASSWORD': 'yld:971202CC',

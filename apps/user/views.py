@@ -1,8 +1,9 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, reverse
+from django.utils.decorators import method_decorator
 from django.views import View
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, QueryDict
 from django.views.decorators.csrf import csrf_exempt
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from itsdangerous import SignatureExpired
@@ -241,18 +242,29 @@ class AddressView(LoginRequiredMixin, View):
         """显示"""
         user = request.user
         address = Address.objects.get_default_address(user)
-        return render(request, 'user_center_site.html',
-                      {'title': '用户中心-收货地址', 'page': 'address', 'address': address})
+        address_all = Address.objects.get_all_address(user)
+        count = len(address_all)
+        context = {
+            'title': '用户中心-收货地址',
+            'page': 'address',
+            'address': address,
+            'count': count,
+            'address_all': address_all,
+        }
+        return render(request, 'user_center_site.html', context)
 
     def post(self, request):
-        # 地址添加
+        """地址添加"""
         receiver = request.POST.get('receiver')
+        province = request.POST.get('province', '浙江省')
+        city = request.POST.get('city', '绍兴市')
+        area = request.POST.get('area', '诸暨市')
+        print(province,city,area)
         addr = request.POST.get('addr')
         zip_code = request.POST.get('zip_code')
         phone = request.POST.get('phone')
         user = request.user
         address = Address.objects.get_default_address(user)
-
         if address:
             is_default = False
         else:
@@ -260,25 +272,66 @@ class AddressView(LoginRequiredMixin, View):
 
         # 数据校验
         if not all([receiver, addr, phone]):
-            return render(request, 'user_center_site.html',
-                          {'page': 'address',
-                           'address': address,
-                           'errmsg': '数据不完整'})
+            return JsonResponse({'message': '数据不完整'})
 
         # 校验手机号
         if not re.match(r'^1([3-8][0-9]|5[189]|8[6789])[0-9]{8}$', phone):
-            return render(request, 'user_center_site.html',
-                          {'page': 'address',
-                           'address': address,
-                           'errmsg': '手机号格式不合法'})
-
+            return JsonResponse({'message': '手机号格式不合法'})
+        phone = int(phone)
+        if zip_code =='':
+            zip_code=None
+        if zip_code:
+            try:
+                zip_code = int(zip_code)
+            except:
+                return JsonResponse({'message': '邮编格式不合法'})
         # 添加
         Address.objects.create(user=user,
                                receiver=receiver,
+                               province=province,
+                               city=city,
+                               area=area,
                                addr=addr,
                                zip_code=zip_code,
                                phone=phone,
                                is_default=is_default)
 
         # 返回应答
-        return redirect(reverse('user:address'))  # get的请求方式
+        return JsonResponse({'message': 'success'})
+        # return redirect(reverse('user:address'))  # get的请求方式
+
+    @method_decorator(csrf_exempt)
+    def put(self, request):
+        """修改地址"""
+        querydict = QueryDict(request.body)
+        id = int(querydict.get('id'))
+        receiver = querydict.get('receiver')
+        province = querydict.get('province', '浙江省')
+        city = querydict.get('city', '绍兴市')
+        area = querydict.get('area', '诸暨市')
+        addr = querydict.get('addr')
+        zip_code = int(querydict.get('zip_code'))
+        phone = int(querydict.get('phone'))
+        if Address.objects.update_address(id, receiver, province, city, area, addr,
+                                          zip_code, phone):
+            return JsonResponse({'message': 'success'})
+        else:
+            return JsonResponse({'message': '修改失败'})
+
+    def delete(self, request):
+        """删除地址"""
+        DELETE = QueryDict(request.body)
+        id = eval(list(dict(DELETE.lists()).keys())[0])['id']
+        if Address.objects.del_address(id):
+            return JsonResponse({'message': 'success'})
+        else:
+            return JsonResponse({'message': '删除失败'})
+
+def set_default_addr(request):
+    """设置默认地址"""
+    id = int(request.POST.get('id'))
+    user = request.user
+    if Address.objects.set_default(user, id):
+        return JsonResponse({'message': 'success'})
+    else:
+        return JsonResponse({'message': '更改失败'})

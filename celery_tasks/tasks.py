@@ -23,8 +23,8 @@ def send_register_active_email(to_mail, username, token):
     subject = 'Leyton商城欢迎信息'
     message = '您的浏览器不支持此消息类型，请更换浏览器'
     html_message = message = '<h1>尊敬的{0},欢迎您注册Leyton商城会员</h1>请点击下面链接激活您的账户<br/>' \
-                             '<a href="http://127.0.0.1:8000/user/active/{1}">' \
-                             'http://127.0.0.1:8000/user/active/{2}</a>'.format(username, token, token)
+                             '<a href="http://yldatomic.cn:8000/user/active/{1}">' \
+                             'http://yldatomic.cn:8000/user/active/{2}</a>'.format(username, token, token)
     sender = settings.EMAIL_FROM
     receiver = [to_mail]
     send_mail(subject, message, sender, receiver, html_message=html_message)
@@ -65,3 +65,5 @@ def generate_static_index_html():
     save_path = os.path.join(settings.BASE_DIR, 'static_page/index.html')
     with open(save_path, 'w') as f:
         f.write(static_index_html)
+    print("执行了生成静态页面任务")
+

@@ -2,18 +2,20 @@
 {% load static %}
 {% block title %}雷顿商城-商品详情{% endblock title %}
 {% block main_content %}
-    <div class="breadcrumb">
+    <div class="breadcrumb" xmlns="http://www.w3.org/1999/html">
         <a href="#">全部分类</a>
         <span>></span>
-        <a href="{% url 'goods:list' sku.type_id 1%}">{{ sku.type.name }}</a>
+        <a href="{% url 'goods:list' sku.type_id 1 %}">{{ sku.type.name }}</a>
         <span>></span>
         <a href="#">商品详情</a>
     </div>
 
     <div class="goods_detail_con clearfix">
-        <div class="goods_detail_pic fl"><img src="{{ sku.image.url }}" height="200" width="200"></div>
+        <div class="goods_detail_pic fl"><img src="{{ sku.image.url }}"></div>
 
         <div class="goods_detail_list fr">
+        <form method="post" action="/order/place/">
+            <input name="sku_id"value="{{ sku.id }}" style="display: none">
             <h3>{{ sku.name }}</h3>
             <p>{{ sku.desc }}</p>
             <div class="prize_bar">
@@ -23,14 +25,14 @@
             <div class="goods_num clearfix">
                 <div class="num_name fl">数 量：{{ sku.stock }}</div>
                 <div class="num_add fl">
-                    <input type="text" class="num_show fl" value="1">
+                    <input type="text" class="num_show fl" name="sku_count" value="1">
                     <a href="javascript:;" class="add fr">+</a>
                     <a href="javascript:;" class="minus fr">-</a>
                 </div>
             </div>
             <div>
                 <div>其他规格:</div>
-                <div>
+                <div class="other_spc">
                     {% for sku in same_spu_skus %}
                         <a href="{% url 'goods:detail' sku.id %}">{{ sku.name }}</a>
                     {% endfor %}
@@ -40,9 +42,11 @@
             {% csrf_token %}
             <div class="operate_btn">
                 {% csrf_token %}
-                <a href="javascript:;" class="buy_btn">立即购买</a>
-                <a href="javascript:;" class="add_cart" sku_id="{{ sku.id }}" id="add_cart">加入购物车</a>
+                <input type="submit" value="立即购买" class="buy_btn">
+{#                <a href="javascript:" class="buy_btn">立即购买</a>#}
+                <a href="javascript:" class="add_cart" sku_id="{{ sku.id }}" id="add_cart">加入购物车</a>
             </div>
+        </form>
         </div>
     </div>
 
@@ -76,14 +80,18 @@
             </div>
 
             <div class="tab_content" id="tab_comment" style="display: none;">
-                <dl>
-                    {% for sku in sku_orders %}
-                        <dt>评论时间: {{ sku.update_time }} 用户名:{{ sku.order.user.username }}</dt>
-                        <dd>评论内容: {{ sku.comment }}</dd>
-                    {% empty %}
-                        暂时没有评论信息
-                    {% endfor %}
-                </dl>
+
+                {% for sku in sku_orders %}
+                    <dd></dd>
+                    <div class="comment_title">
+                        <span class="comment_name">用户:{{ sku.order.user.username }} </span>
+                        <span class="comment_time">{{ sku.update_time }} </span>
+                    </div>
+                    <dd>{{ sku.comment }}</dd>
+                {% empty %}
+                    暂时没有评论信息
+                {% endfor %}
+
             </div>
 
         </div>
@@ -180,7 +188,7 @@
                             });
 
                         });
-                }else if(data.res==0){
+                } else if (data.res == 0) {
                     alert(data.errmsg)
                 }
 

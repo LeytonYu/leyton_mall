@@ -1,6 +1,8 @@
 from django.urls import path
 from .views import name_check, email_check, RegisterView, ActiveView, LoginView, LogoutView, UserInfoView, \
-    UserOrderView, AddressView
+    UserOrderView, AddressView,set_default_addr
+from django.views.decorators.csrf import csrf_exempt
+
 
 app_name = 'user'
 urlpatterns = [
@@ -11,7 +13,8 @@ urlpatterns = [
     path('login/', LoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('order/<int:page>', UserOrderView.as_view(), name='order'),
-    path('address/', AddressView.as_view(), name='address'),
+    path('address/', csrf_exempt(AddressView.as_view()), name='address'),
+    path('setdef/',set_default_addr, name='setdef'),
     path('', UserInfoView.as_view(), name='user'),
 
 ]

@@ -17,10 +17,12 @@
         {% for sku in skus %}
             <ul class="cart_list_td clearfix">
                 <li class="col01"><input type="checkbox" name="sku_id" value="{{ sku.id }}" checked></li>
-                <li class="col02"><img src="{{ sku.image.url }}"></li>
-                <li class="col03">{{ sku.name }}<br><em>{{ sku.price }}元/{{ sku.unite }}</em></li>
+                <li class="col02"><a href="{% url 'goods:detail' sku.id %}" >
+                    <img src="{{ sku.image.url }}"></a></li>
+                <li class="col03"><a href="{% url 'goods:detail' sku.id %}" >{{ sku.name }}
+                    <br><em>{{ sku.price }}元/{{ sku.unite }}</em></a></li>
                 <li class="col04">{{ sku.unite }}</li>
-                <li class="col05">{{ sku.price }}</li>
+                <li class="col05">{{ sku.price }} 元</li>
                 <li class="col06">
                     <div class="num_add">
                         <a href="javascript:;" class="add fl">+</a>
@@ -28,9 +30,9 @@
                         <a href="javascript:;" class="minus fl">-</a>
                     </div>
                 </li>
-                <li class="col07">{{ sku.amount }}元</li>
+                <li class="col07">{{ sku.amount }} 元</li>
                 {# 单件商品小计#}
-                <li class="col08"><a href="javascript:;">删除</a></li>
+                <li class="col08"><div class="del_btn"><a href="javascript:">删除</a></div> </li>
             </ul>
         {% endfor %}
 
@@ -179,7 +181,7 @@
         })
 
         // 删除购物车记录
-        $('.cart_list_td').children('.col08').children('a').click(function () {
+        $('.cart_list_td').children('.col08').children('div').children('a').click(function () {
             if (confirm('真的要删除吗？')) {
                 var sku_id = $(this).parents('ul').find('.num_show').attr('id')
                 var csrf = $('input[name="csrfmiddlewaretoken"]').val()
