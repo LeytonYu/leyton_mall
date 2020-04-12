@@ -149,7 +149,7 @@ class ListView(View):
             pages=range(page-2,page+3)
 
         # 获取新品推荐信息
-        new_skus = GoodsSKU.objects.filter(type=type).order_by('-create_time')
+        new_skus = GoodsSKU.objects.filter(type=type).order_by('-create_time')[:3]
 
         # 获取登录用户的额购物车中的商品的数量
         user = request.user
