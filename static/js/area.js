@@ -53,12 +53,4 @@ $(function () {
     $('#btntext').click(function () {
         alert($('#loc_province').select2('data').text + ' - ' + $('#loc_city').select2('data').text + ' - ' + $('#loc_town').select2('data').text)
     });
-    $('form').submit(function () {
-        if ($('#loc_town').val() == null || $('#loc_town').val() == "") {
-            alert("请补充地址信息");
-            return false
-        } else {
-            return true
-        }
-    });
 });

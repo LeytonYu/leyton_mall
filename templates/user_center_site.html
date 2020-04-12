@@ -1,14 +1,14 @@
 {% extends 'base_user_center.html' %}
 {% load static %}
 {% block topfiles %}
-    <script type="text/javascript" src="{% static 'js/jquery.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jquery-1.12.4.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/area.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/location.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/select2.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/select2_locale_zh-CN.js' %}"></script>
-    <script type="text/javascript" src="{% static 'js/vue.js' %}"></script>
-    <script src="{% static 'js/vue-resource.min.js' %}"></script>
-    <script src="{% static 'js/vue-router.js' %}"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js"></script>
+    <script src="https://cdn.staticfile.org/vue-resource/1.5.1/vue-resource.min.js"></script>
+    <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
     <link rel="stylesheet" type="text/css" href="{% static 'css/select2.css' %}">
 {% endblock %}
 {% block right_content %}

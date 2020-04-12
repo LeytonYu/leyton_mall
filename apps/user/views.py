@@ -17,6 +17,7 @@ import re
 from .models import User, Address
 from apps.goods.models import GoodsSKU
 from django_redis import get_redis_connection
+from django.db.models import Q
 
 
 # Create your views here.
@@ -126,12 +127,14 @@ class LoginView(View):
         print(username, password)
         if not all([username, password]):
             return render(request, 'login.html', {'errmsg': '请检查信息完整性'})
-        try:
-            user = User.objects.get(username=username)
+
+        user = User.objects.filter(Q(username=username) | Q(email=username))
+        if user:
+            user = user[0]
             password2 = user.password
             if check_password(password, password2):
                 if user.is_active:
-                    print("User is valid")
+                    print("用户激活了")
                     login(request, user)
                     next_url = request.GET.get('next', reverse('goods:index'))
                     response = redirect(next_url)
@@ -143,10 +146,10 @@ class LoginView(View):
 
                     return response
                 else:
-                    print("User is not valid")
+                    print("用户没激活")
                     return render(request, 'login.html', {'errmsg': '账户未激活'})
             return render(request, 'login.html', {'errmsg': '用户名或密码错误'})
-        except:
+        else:
             return render(request, 'login.html', {'errmsg': '用户不存在'})
 
 
@@ -259,7 +262,7 @@ class AddressView(LoginRequiredMixin, View):
         province = request.POST.get('province', '浙江省')
         city = request.POST.get('city', '绍兴市')
         area = request.POST.get('area', '诸暨市')
-        print(province,city,area)
+        print(province, city, area)
         addr = request.POST.get('addr')
         zip_code = request.POST.get('zip_code')
         phone = request.POST.get('phone')
@@ -278,8 +281,8 @@ class AddressView(LoginRequiredMixin, View):
         if not re.match(r'^1([3-8][0-9]|5[189]|8[6789])[0-9]{8}$', phone):
             return JsonResponse({'message': '手机号格式不合法'})
         phone = int(phone)
-        if zip_code =='':
-            zip_code=None
+        if zip_code == '':
+            zip_code = None
         if zip_code:
             try:
                 zip_code = int(zip_code)
@@ -326,6 +329,7 @@ class AddressView(LoginRequiredMixin, View):
             return JsonResponse({'message': 'success'})
         else:
             return JsonResponse({'message': '删除失败'})
+
 
 def set_default_addr(request):
     """设置默认地址"""
