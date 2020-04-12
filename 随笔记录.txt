@@ -7,3 +7,21 @@ nginx启动(关闭)：
 sudo /usr/loacl/nginx/sbin/nginx (-stop)
 
 Linux下： fdfs_upload_file /etc/fdfs/client.conf 图片路径
+
+收集静态文件：
+设置static_root
+创建相应的文件夹
+python manage.py collectstatic
+
+配置supervisor和celery：
+superviosr常用命令：
+supervisorctl status 查看进程运行状态
+supervisorctl start 进程名 启动进程
+supervisorctl stop 进程名 关闭进程
+supervisorctl restart 进程名 重启进程
+supervisorctl update 重新载入配置文件
+supervisorctl shutdown 关闭supervisord
+supervisorctl clear 进程名 清空进程日志
+supervisorctl 进入到交互模式下。使用help查看所有命令。
+start stop restart + all 表示启动，关闭，重启所有进程。
+

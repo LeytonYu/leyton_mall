@@ -134,7 +134,7 @@ class LoginView(View):
             password2 = user.password
             if check_password(password, password2):
                 if user.is_active:
-                    print("User is valid")
+                    print("用户激活了")
                     login(request, user)
                     next_url = request.GET.get('next', reverse('goods:index'))
                     response = redirect(next_url)
@@ -146,7 +146,7 @@ class LoginView(View):
 
                     return response
                 else:
-                    print("User is not valid")
+                    print("用户没激活")
                     return render(request, 'login.html', {'errmsg': '账户未激活'})
             return render(request, 'login.html', {'errmsg': '用户名或密码错误'})
         else:

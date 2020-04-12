@@ -49,7 +49,7 @@ class GoodsSKU(BaseModel):
 
 class Goods(BaseModel):
     """商品SPU模型类"""
-    name = models.CharField(max_length=20, verbose_name='商品SPU名称')
+    name = models.CharField(max_length=80, verbose_name='商品SPU名称')
     # 富文本类型
     detail = HTMLField(blank=True, verbose_name='商品详情')
 

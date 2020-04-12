@@ -118,6 +118,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT = '/home/ubuntu/static/leyton_mall'
 
+
 # 富文本编辑器
 TINYMCE_DEFAULT_CONFIG = {
     'theme': 'advanced',
@@ -137,6 +138,7 @@ EMAIL_HOST_USER = 'yldhiking@163.com'
 EMAIL_HOST_PASSWORD = 'yld971202grant'
 # 收件人看到的发件人
 EMAIL_FROM = 'Leyton<yldhiking@163.com>'
+DEFAULT_FROM_EMAIL = "yldhiking@163.com"
 EMAIL_USE_SSL = True
 REDIS_CONFIG = 'redis://:yld971202rds@yldatomic.cn:6379/2'
 
