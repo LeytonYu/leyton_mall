@@ -313,7 +313,10 @@ class AddressView(LoginRequiredMixin, View):
         city = querydict.get('city', '绍兴市')
         area = querydict.get('area', '诸暨市')
         addr = querydict.get('addr')
-        zip_code = int(querydict.get('zip_code'))
+        try:
+            zip_code = int(querydict.get('zip_code'))
+        except Exception:
+            zip_code = None
         phone = int(querydict.get('phone'))
         if Address.objects.update_address(id, receiver, province, city, area, addr,
                                           zip_code, phone):
