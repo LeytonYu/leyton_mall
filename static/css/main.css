@@ -1649,8 +1649,10 @@ html, body {
 }
 
 .goods_list_td .col03 {
-    text-align: left;
-    text-indent: 20px
+    height: 48px;
+    text-align: center;
+    line-height: 24px;
+    margin-top: 15px;
 }
 
 
@@ -1747,7 +1749,9 @@ html, body {
 
 .order_goods_list .col02 {
     width: 50%;
-    text-align: left;
+    text-align: center;
+    height: 80px;
+    line-height: 40px;
 }
 
 .order_goods_list .col02 em {
