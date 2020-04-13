@@ -27,7 +27,7 @@
                     <form method="post">
                         {% csrf_token %}
                         <input type="text" name="username" class="name_input" value="{{ username }}"
-                               placeholder="请输入用户名">
+                               placeholder="请输入用户名或邮箱">
                         <div id="name_err" class="user_error">
                             <label  style="color: lightpink;">用户名不能为空</label>
                         </div>

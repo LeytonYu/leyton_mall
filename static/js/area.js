@@ -54,3 +54,4 @@ $(function () {
         alert($('#loc_province').select2('data').text + ' - ' + $('#loc_city').select2('data').text + ' - ' + $('#loc_town').select2('data').text)
     });
 });
+
