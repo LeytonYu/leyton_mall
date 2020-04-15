@@ -1944,6 +1944,7 @@ html, body {
     border: 1px solid #ddd;
     outline: none;
     padding: 10px;
+    resize: none;
 }
 
 .info_submit {
