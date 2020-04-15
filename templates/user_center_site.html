@@ -265,7 +265,7 @@
                     console.log(id, receiver, addr, zip_code, phone)
                     this.receiver = receiver
                     this.address = addr
-                    if (zip_code == "无") {
+                    if (zip_code != "无") {
                         this.zip_code = zip_code
                     } else {
                         this.zip_code = ''

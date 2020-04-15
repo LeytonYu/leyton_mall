@@ -51,7 +51,7 @@
     <script>
         update_flag = false
         cart_count = 0
-
+        update_page()
         //更新被选中商品的总件数和总价
         function update_page() {
             var cart_price = 0
@@ -193,7 +193,7 @@
                         var is_checked = sku_ul.find(':checkbox').prop('checked')
                         if (is_checked) {
                             // 更新页面信息
-                            update_page_info()
+                            update_page()
                         }
                         // 设置页面购物车中商品的总件数
                         $('.total_count').children('em').text(data.cart_count)
