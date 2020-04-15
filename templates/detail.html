@@ -23,9 +23,10 @@
                 <span class="show_unit">单  位：{{ sku.unite }}</span>
             </div>
             <div class="goods_num clearfix">
-                <div class="num_name fl">数 量：{{ sku.stock }}</div>
+                <input id="stock" value="{{ sku.stock }}" style="display: none">
+                <div class="num_name fl">库  存：{{ sku.stock }}</div>
                 <div class="num_add fl">
-                    <input type="text" class="num_show fl" name="sku_count" value="1">
+                    <input type="text" class="num_show fl" name="sku_count" value="0">
                     <a href="javascript:;" class="add fr">+</a>
                     <a href="javascript:;" class="minus fr">-</a>
                 </div>
@@ -173,6 +174,10 @@
         $('#add_cart').click(function () {
             sku_id = $(this).attr('sku_id')
             count = $('.num_show').val()
+            if ($('.stock').val()<count){
+                alert("你看看库存！")
+                return;
+            }
             csrf = $('input[name="csrfmiddlewaretoken"]').val()
             params = {'sku_id': sku_id, 'count': count, 'csrfmiddlewaretoken': csrf}
             $.post('/cart/add/', params, function (data) {
