@@ -69,7 +69,7 @@ class CartInfoView(LoginRequiredMixin, View):
         context = {'cart_count': cart_count,
                    'cart_price': cart_price,
                    'skus': skus}
-        return render(request, 'cart.html', context)
+        return render(request, 'cart/cart.html', context)
 
 # /cart/update
 class CartUpdateView(View):

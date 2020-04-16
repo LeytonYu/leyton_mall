@@ -45,7 +45,7 @@ class RegisterView(View):
 
     def get(self, request):
         """显示注册页"""
-        return render(request, 'register.html')
+        return render(request, 'user/register.html')
 
     def post(self, request):
         """经行注册处理"""
@@ -56,19 +56,19 @@ class RegisterView(View):
         allow = request.POST.get('allow')
 
         if not all([username, password, email]):
-            return render(request, 'register.html', {'errmsg': '数据不完整'})
+            return render(request, 'user/register.html', {'errmsg': '数据不完整'})
 
         if not re.match('^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$', email):
-            return render(request, 'register.html', {'errmsg': '邮箱格式不正确'})
+            return render(request, 'user/register.html', {'errmsg': '邮箱格式不正确'})
 
         if allow != 'on':
-            return render(request, 'register.html', {'errmsg': '请同意协议'})
+            return render(request, 'user/register.html', {'errmsg': '请同意协议'})
         try:
             user = User.objects.get(username=username)
         except User.DoesNotExist:
             user = None
         if user:
-            return render(request, 'register.html', {'errmsg': '用户名已存在'})
+            return render(request, 'user/register.html', {'errmsg': '用户名已存在'})
         # 用户注册数据库操作
         user = User.objects.create_user(username, email, password)
         user.is_active = 0
@@ -118,7 +118,7 @@ class LoginView(View):
             username = ''
             checked = ''
 
-        return render(request, 'login.html', {'username': username, 'checked': checked})
+        return render(request, 'user/login.html', {'username': username, 'checked': checked})
 
     def post(self, request):
         """登录校验"""
@@ -126,7 +126,7 @@ class LoginView(View):
         password = request.POST.get('pwd')
         print(username, password)
         if not all([username, password]):
-            return render(request, 'login.html', {'errmsg': '请检查信息完整性'})
+            return render(request, 'user/login.html', {'errmsg': '请检查信息完整性'})
 
         user = User.objects.filter(Q(username=username) | Q(email=username))
         if user:
@@ -147,10 +147,10 @@ class LoginView(View):
                     return response
                 else:
                     print("用户没激活")
-                    return render(request, 'login.html', {'errmsg': '账户未激活'})
-            return render(request, 'login.html', {'errmsg': '用户名或密码错误'})
+                    return render(request, 'user/login.html', {'errmsg': '账户未激活'})
+            return render(request, 'user/login.html', {'errmsg': '用户名或密码错误'})
         else:
-            return render(request, 'login.html', {'errmsg': '用户不存在'})
+            return render(request, 'user/login.html', {'errmsg': '用户不存在'})
 
 
 # /user/logout
@@ -188,7 +188,7 @@ class UserInfoView(LoginRequiredMixin, View):
             'goods_list': goods_list
         }
 
-        return render(request, 'user_center_info.html', context)
+        return render(request, 'user/user_center_info.html', context)
 
 
 # /user/order
@@ -234,7 +234,7 @@ class UserOrderView(LoginRequiredMixin, View):
             'page': 'order',
         }
         print(pages)
-        return render(request, 'user_center_order.html', context)
+        return render(request, 'user/user_center_order.html', context)
 
 
 # /user/address
@@ -254,7 +254,7 @@ class AddressView(LoginRequiredMixin, View):
             'count': count,
             'address_all': address_all,
         }
-        return render(request, 'user_center_site.html', context)
+        return render(request, 'user/user_center_site.html', context)
 
     def post(self, request):
         """地址添加"""

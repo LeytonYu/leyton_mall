@@ -39,7 +39,7 @@
     {# 网页搜索框块 #}
     {% block search_bar %}
 	<div class="search_bar clearfix">
-		<a href="index.html" class="logo fl"><img src="{% static 'images/logo.png' %}"></a>
+		<a href="{% url 'goods:index' %}" class="logo fl"><img src="{% static 'images/logo.png' %}"></a>
 		<div class="search_con fl">
 			<form action="/search" method="get">
                 <input type="text" class="input_text fl" name="q" placeholder="搜索商品">
@@ -66,9 +66,9 @@
 
 	<div class="footer">
 		<div class="foot_link">
-			<a href="https://github.com/FarAwayStar">关于作者</a>
+			<a href="https://github.com/LeytonYu">关于作者</a>
 			<span>|</span>
-			<a href="https://github.com/FarAwayStar">联系作者</a>
+			<a href="https://github.com/LeytonYu">联系作者</a>
 			<span>|</span>
 			<a href="#">更快更强</a>
 		</div>
