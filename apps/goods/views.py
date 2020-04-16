@@ -58,7 +58,7 @@ class IndexView(View):
         # 组织上下文
         context['cart_count'] = cart_count
 
-        return render(request, 'index.html', context)
+        return render(request, 'goods/index.html', context)
 
 
 class DetailView(View):
@@ -106,7 +106,7 @@ class DetailView(View):
                    'new_skus': new_skus,
                    'same_spu_skus': same_spu_skus,
                    'cart_count': cart_count}
-        return render(request, 'detail.html',context)
+        return render(request, 'goods/detail.html', context)
 
 class ListView(View):
     """列表页"""
@@ -170,5 +170,5 @@ class ListView(View):
                    'pages': pages,
                    'cart_count': cart_count}
 
-        return render(request,'list.html',context)
+        return render(request, 'goods/list.html', context)
 

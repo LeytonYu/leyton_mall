@@ -77,7 +77,7 @@ class OrderPlaceView(LoginRequiredMixin, View):
                 'skus': skus,
                 'sku_ids': sku_ids,
             }
-        return render(request, 'place_order.html', context)
+        return render(request, 'order/place_order.html', context)
 
 
 # /order/commit
@@ -323,7 +323,7 @@ class OrderCommentView(LoginRequiredMixin, View):
             order_good.amount = order_good.price * order_good.count
 
         order.order_goods = order_goods
-        return render(request, 'order_comment.html', {'order': order})
+        return render(request, 'order/order_comment.html', {'order': order})
 
     def post(self, request, order_id):
         """订单评论提交"""
