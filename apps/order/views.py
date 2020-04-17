@@ -111,7 +111,6 @@ class OrderCommintView(View):
 
         # 设置事务保存点
         save_id = transaction.savepoint()
-
         try:
             order = OrderInfo.objects.create(order_id=order_id,
                                              user=user,
@@ -189,10 +188,6 @@ class OrderPayView(View):
         # alipay初始化
         app_private_key_string = open("apps/order/app_private_key.pem").read()
         alipay_public_key_string = open("apps/order/alipay_public_key.pem").read()
-
-        # app_private_key_string = os.path.join(settings.BASE_DIR, 'apps/order/app_private_key.pem')
-        # alipay_public_key_string = os.path.join(settings.BASE_DIR, 'apps/order/alipay_public_key.pem')
-
         alipay = AliPay(
             appid="2016102000727191",  # 应用id
             app_notify_url=None,  # 默认回调url
@@ -201,9 +196,6 @@ class OrderPayView(View):
             sign_type="RSA2",
             debug=True  # 默认False, 此处沙箱模拟True
         )
-
-        # 调用支付接口
-        # 电脑网站支付，需要跳转到https://openapi.alipaydev.com/gateway.do? + order_string
         total_pay = order.total_price + order.total_freight
         order_string = alipay.api_alipay_trade_page_pay(
             out_trade_no=order_id,  # 订单id
@@ -212,10 +204,8 @@ class OrderPayView(View):
             return_url=None,
             notify_url=None  # 可选, 不填则使用默认notify url
         )
-
         # 返回应答
         pay_url = 'https://openapi.alipaydev.com/gateway.do?{0}'.format(order_string)
-
         return JsonResponse({'res': 3, 'pay_url': pay_url})
 
 
@@ -256,41 +246,12 @@ class OrderCheckView(View):
         # 调用支付宝的交易查询接口
         while True:
             response = alipay.api_alipay_trade_query(order_id)
-
-            # response = {
-            # "trade_no": "2017032121001004070200176844",  # 支付宝交易号
-            # "code": "10000",  # 接口调用成功
-            # "invoice_amount": "20.00",
-            # "open_id": "20880072506750308812798160715407",
-            # "fund_bill_list": [
-            #     {
-            #         "amount": "20.00",
-            #         "fund_channel": "ALIPAYACCOUNT"
-            #     }
-            # ],
-            # "buyer_logon_id": "csq***@sandbox.com",
-            # "send_pay_date": "2017-03-21 13:29:17",
-            # "receipt_amount": "20.00",
-            # "out_trade_no": "out_trade_no15",
-            # "buyer_pay_amount": "20.00",
-            # "buyer_user_id": "2088102169481075",
-            # "msg": "Success",
-            # "point_amount": "0.00",
-            # "trade_status": "TRADE_SUCCESS",  # 支付结果
-            # "total_amount": "20.00"
-            # }
-
             code = response.get('code')
-
             if code == '10000' and response.get('trade_status') == 'TRADE_SUCCESS':
-                # 支付成功
-                # 获取支付宝交易号
-                trade_no = response.get('trade_no')
-                # 更新订单状态
-                order.trade_no = trade_no
+                trade_no = response.get('trade_no')     # 支付成功，获取支付宝交易号
+                order.trade_no = trade_no                # 更新订单状态
                 order.order_status = 4  # 待评价
-                order.save()
-                # 返回应答
+                order.save()    # 返回应答
                 return JsonResponse({'res': 3, 'message': '支付成功'})
             elif code == '40004' or (code == '10000' and response.get('trade_status') == 'WAIT_BUYER_PAY'):
                 # 等待买家付款

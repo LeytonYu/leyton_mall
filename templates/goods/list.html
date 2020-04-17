@@ -52,7 +52,7 @@
                     <a href="{% url 'goods:list' type.id skus_page.previous_page_number %}?sort={{ sort }}">上一页</a>
                 {% endif %}
 
-                {% for pageindex in skus_page.paginator.page_range %}
+                {% for pageindex in pages %}
                     {% if pageindex == skus_page.number %}
                         <a href="{% url 'goods:list' type.id pageindex %}?sort={{ sort }}"
                            class="active">{{ pageindex }}</a>

@@ -74,28 +74,20 @@
             if (status == 1){
                 // 进行支付
                 csrf = $('input[name="csrfmiddlewaretoken"]').val()
-                // 组织参数
                 params = {'order_id': order_id, 'csrfmiddlewaretoken': csrf}
-                // 发起ajax post请求, 访问/order/pay, 传递参数:order_id
                 $.post('{% url 'order:pay' %}', params, function (data) {
                     if (data.res == 3){
                         // 引导用户到支付页面
                         window.open(data.pay_url)
-                        // 浏览器访问order/check,获取支付交易结果
-                        // ajax post  传递参数:order_id
                         $.post('{% url 'order:check' %}', params, function () {
                             if (data.res == 3){
                                 alert('支付成功')
-                                //重新加载
                                 location.reload()
-
-                            }
-                            else{
+                            } else{
                                 alert(data.errmsg)
                             }
                         })
-                    }
-                    else{
+                    } else{
                         alert(data.errmsg)
                     }
                 })

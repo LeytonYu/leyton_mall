@@ -65,7 +65,6 @@
             $('.settlements').find('em').text(cart_price.toFixed(2))
             $('.settlements').find('b').text(cart_count)
         }
-
         //全选和全不选
         $('.settlements').find(':checkbox').change(function () {
             var is_checked = $(this).prop('checked')
@@ -85,7 +84,6 @@
             $('.settlements').find(':checkbox').prop('checked', is_checked)
             update_page()
         })
-
         //更新商品小计
         function update_sku(sku_ul) {
             var price = sku_ul.children('.col05').text()
@@ -93,7 +91,7 @@
             var amount = parseInt(count) * parseInt(price)
             sku_ul.children('.col07').text(amount.toFixed(2) + '元')
         }
-
+        //更改后端购物车内容
         function update_backend_cart(sku_id, count) {
             var csrf = $('input[name="csrfmiddlewaretoken"]').val()
             var params = {'sku_id': sku_id, 'count': count, 'csrfmiddlewaretoken': csrf}
@@ -109,7 +107,6 @@
             })
             $.ajaxSettings.async = true
         }
-
         //点击增加商品
         $('.add').click(function () {
             var count = $(this).next().val()
@@ -147,13 +144,11 @@
                 $('.total_count').children('em').text(cart_count)
             }
         })
-
         //购物车焦点事件，保存修改前的数据
         pre_count = 0
         $('.num_show').focus(function () {
             pre_count = $(this).val()
         })
-
         //手动输入购物车数目
         $('.num_show').blur(function () {
             var count = $(this).val()
@@ -179,7 +174,6 @@
                 $('.total_count').children('em').text(cart_count)
             }
         })
-
         // 删除购物车记录
         $('.cart_list_td').children('.col08').children('div').children('a').click(function () {
             if (confirm('真的要删除吗？')) {

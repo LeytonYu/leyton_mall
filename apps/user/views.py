@@ -91,7 +91,7 @@ class ActiveView(View):
     """用户激活"""
 
     def get(self, request, token):
-        """经行用户激活"""
+        """用户激活"""
         serializer = Serializer(settings.SECRET_KEY, 3600)
         try:
             info = serializer.loads(token)
@@ -134,7 +134,6 @@ class LoginView(View):
             password2 = user.password
             if check_password(password, password2):
                 if user.is_active:
-                    print("用户激活了")
                     login(request, user)
                     next_url = request.GET.get('next', reverse('goods:index'))
                     response = redirect(next_url)
@@ -143,10 +142,8 @@ class LoginView(View):
                         response.set_cookie('username', username, max_age=7 * 24 * 3600)
                     else:
                         response.delete_cookie('username')
-
                     return response
                 else:
-                    print("用户没激活")
                     return render(request, 'user/login.html', {'errmsg': '账户未激活'})
             return render(request, 'user/login.html', {'errmsg': '用户名或密码错误'})
         else:

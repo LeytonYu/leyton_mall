@@ -1,12 +1,14 @@
 $(function(){
 	var $slides = $('.slide_pics li');
-	var len = $slides.length;
-	var nowli = 0;
-	var prevli = 0;
+	var len = $slides.length;	//图片数量
+	var nowli = 0;	//即将切换的图
+	var prevli = 0;		//当前图片
 	var $prev = $('.prev');
 	var $next = $('.next');
 	var ismove = false;
 	var timer = null;
+
+	//每个li的宽度是760，这里把除了第一个图之外的所有图都放到右边
 	$slides.not(':first').css({left:760});
 	$slides.each(function(index, el) {
 		var $li = $('<li>');

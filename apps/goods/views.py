@@ -93,7 +93,7 @@ class DetailView(View):
             conn = get_redis_connection('default')
             # 添加用户的历史记录
             history_key = 'history_%d' % user.id
-            # 移除列表中的goods_id
+            # 移除列表中的goods_id，0代表所有
             conn.lrem(history_key, 0, goods_id)
             # 把goods_id插入到列表的左侧
             conn.lpush(history_key, goods_id)

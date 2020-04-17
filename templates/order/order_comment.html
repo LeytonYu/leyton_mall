@@ -35,7 +35,7 @@
             <input type="hidden" name="sku_{{ forloop.counter }}" value="{{ good.sku.id }}">
             <div class="form_group form_group2">
                 <label>评价内容：</label>
-                <textarea class="site_area" name="content_{{ forloop.counter }}"></textarea>
+                <textarea class="site_area" name="content_{{ forloop.counter }}" required></textarea>
             </div>
         </div>
         {% endfor %}
