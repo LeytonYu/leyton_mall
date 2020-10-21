@@ -16,7 +16,7 @@ sudo vim /etc/fdfs/tracker.conf
 4.配置storage
 sudo cp /etc/fdfs/storage.conf.sample /etc/fdfs/storage.conf
 mkdir -p /home/ubuntu/fastdfs/storage
-sudo vim /etc/fdfs/storage.conf
+sudo vim /etc/fdfs/tracker.conf
 修改 base_path=/home/ubuntu/fastdfs/storage
 修改 store_path0=/home/ubuntu/fastdfs/storage
 修改 tracker_server=ip地址:22122
@@ -37,8 +37,8 @@ fdfs_upload_file /etc/fdfs/client.conf 图片路径
 
 8.安装fasfdfs-nginx-module web服务器epoll
 进入nginx解压缩目录， sudo ./configure --prefix=/usr/local/nginx --add-module=fastdfs-nginx-module解压目录绝对路径/src
-sudo make
-sudo make install
+sudo ./make
+sudo ./make install
 sudo cp fastdfs-nginx-module解压目录中src下的mod_fastdfs.conf /etc/fdfs/mod_fastdfs.conf
 修改内容：
 connect_timeout=10
@@ -71,10 +71,7 @@ sudo /usr/loacl/nginx/sbin/nginx -s reload
 重启fastdfs：
 sudo service fdfs_storaged restart
 
-uwsgi
-启动：uwsgi --ini uwsgi.ini
-停止：uwsgi --stop uwsgi.pid
-重启：uwsgi --reload uwsgi.pid
+
 
 
 
