@@ -5,7 +5,6 @@ from django.template import loader
 
 # django环境的初始化，在任务处理者worker一端加以下几句
 import os
-
 import django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'leyton_mall.settings')
 django.setup()

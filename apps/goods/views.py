@@ -137,7 +137,7 @@ class ListView(View):
         if page>num_pages or page<=0:
             page =1
 
-        skus_page=paginator.page(page)
+        skus_page = paginator.page(page)
 
         if num_pages<5:
             pages =range(1,num_pages+1)
