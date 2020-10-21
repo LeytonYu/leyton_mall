@@ -140,8 +140,6 @@ EMAIL_HOST_PASSWORD = 'yld971202grant'
 EMAIL_FROM = 'Leyton<yldhiking@163.com>'
 DEFAULT_FROM_EMAIL = "yldhiking@163.com"
 EMAIL_USE_SSL = True
-
-
 REDIS_CONFIG = 'redis://:yld971202rds@yldatomic.cn:6379/2'
 
 # Django的缓存配置
@@ -185,9 +183,4 @@ HAYSTACK_CONNECTIONS = {
 
 # 当添加、修改、删除数据时，自动生成索引
 HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
-# 搜索结果页面数量
-HAYSTACK_SEARCH_RESULTS_PER_PAGE = 15
 
-
-# 当添加、修改、删除数据时，自动生成索引
-HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
