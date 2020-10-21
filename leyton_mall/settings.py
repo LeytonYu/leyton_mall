@@ -12,7 +12,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '492oj$t*rm1a#!v-&=b*1k-b#$-@4m@t6(ik9sy+z(gxrh*5_h'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
 
@@ -132,6 +132,10 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.163.com'
 EMAIL_PORT = 465
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+
+>>>>>>> parent of df2ad46... Delete settings.py
 =======
 
 >>>>>>> parent of df2ad46... Delete settings.py
@@ -144,7 +148,10 @@ EMAIL_FROM = 'Leyton<yldhiking@163.com>'
 DEFAULT_FROM_EMAIL = "yldhiking@163.com"
 EMAIL_USE_SSL = True
 <<<<<<< HEAD
+<<<<<<< HEAD
 
+=======
+>>>>>>> parent of df2ad46... Delete settings.py
 =======
 >>>>>>> parent of df2ad46... Delete settings.py
 REDIS_CONFIG = 'redis://:yld971202rds@yldatomic.cn:6379/2'
@@ -188,10 +195,16 @@ HAYSTACK_CONNECTIONS = {
     },
 }
 <<<<<<< HEAD
+<<<<<<< HEAD
 # 当添加、修改、删除数据时，自动生成索引
 HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 # 搜索结果页面数量
 HAYSTACK_SEARCH_RESULTS_PER_PAGE = 15
+=======
+
+# 当添加、修改、删除数据时，自动生成索引
+HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+>>>>>>> parent of df2ad46... Delete settings.py
 =======
 
 # 当添加、修改、删除数据时，自动生成索引
